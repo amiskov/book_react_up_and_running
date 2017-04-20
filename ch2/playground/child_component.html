@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script src="../../../js/react.js"></script>
+    <script src="../../js/react-dom.js"></script>
+    <script>
+    var logMixin = {
+        componentWillUpdate: function() {
+            this._log('componentWillUpdate', arguments);
+        },
+        componentDidUpdate: function() {
+            this._log('componentDidUpdate', arguments);
+        },
+        componentWillMount: function() {
+            this._log('componentWillMount', arguments);
+        },
+        componentDidMount: function() {
+            var el = ReactDOM.findDOMNode(this);
+            console.log(el);
+            this._log('componentDidMount', arguments);
+        },
+        _log: function(methodName, args) {
+            console.log(this.name + '::' + methodName, args);
+        },
+        componentWillUnmount: function() {
+            this._log('componentWillUnmount', arguments);
+        },
+
+    };
+
+    var Counter = React.createClass({
+        name: 'Counter',
+        // mixins: [logMixin],
+        propTypes: {
+            count: React.PropTypes.number.isRequired
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            // console.log(this.name + '::shouldComponentUpdate()');
+            return nextProps.count !== this.props.count;
+        },
+
+        render() {
+            // Не работает со стейтом, только показывает цифру из свойства:
+            console.log(this.name + '::render()');
+            return React.DOM.span(null, this.props.count);
+
+        }
+    });
+
+    var TextAreaCounter = React.createClass({
+        name: 'TextAreaCounter',
+        // mixins: [logMixin],
+        propTypes: {
+            text: React.PropTypes.string,
+        },
+
+        getInitialState: function() {
+            return {
+                text: this.props.text,
+            };
+        },
+
+        _textChange: function(ev) {
+            this.setState({
+                text: ev.target.value,
+            });
+        },
+
+        componentWillReceiveProps: function(newProps) {
+            this.setState({
+                text: newProps.text,
+            });
+        },
+
+        render: function() {
+            console.log(this.name + '::render()');
+
+            var counter = null;
+
+            if (this.state.text.length > 0) {
+                counter = React.DOM.h3(null,
+                    React.createElement(Counter, {
+                        count: this.state.text.length,
+                    })
+                );
+            }
+
+
+            return React.DOM.div(null,
+                React.DOM.textarea({
+                    value: this.state.text,
+                    onChange: this._textChange,
+                }),
+                counter
+            );
+        }
+    });
+
+    var myTextareaCounter = ReactDOM.render(
+        React.createElement(TextAreaCounter, {
+            text: "Bob",
+        }),
+        document.getElementById("app")
+    );
+
+    // Этот код не изменит ничего. Реакт следит за стейтом и не дает его менять
+    // при пересоздании компонента:
+    // myTextAreaCounter = ReactDOM.render(
+    //     React.createElement(TextAreaCounter, {
+    //         text: "Hello", // previously known as "Bob"
+    //     }),
+    //     document.getElementById("app")
+    // );
+    // // Да, свойства поменялись, но внешний вид остался прежним:
+    // console.log(myTextAreaCounter.props);
+    </script>
+</body>
+
+</html>

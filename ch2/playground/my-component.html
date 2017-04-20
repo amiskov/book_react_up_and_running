@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <hr>
+    <div id="appFactory"></div>
+    <hr>
+    <div id="appProp"></div>
+    <script src="../../../js/react.js"></script>
+    <script src="../../js/react-dom.js"></script>
+    <script>
+    var MyComponent = React.createClass({
+        render: function() { // обязательный метод
+            return React.DOM.span({
+                    className: 'my-component'
+                },
+                "I'm so custom"
+            )
+        }
+    })
+
+    // Когда нужно создать один экземпляр:
+    ReactDOM.render(
+        React.createElement(MyComponent),
+        document.getElementById("app")
+    );
+
+    // Когда нужна куча компонентов, можно юазть фабрику:
+    var MyComponentFactory = React.createFactory(MyComponent);
+    ReactDOM.render(
+        MyComponentFactory(),
+        document.getElementById("appFactory")
+    );
+
+    // Properties:
+    var Greeter = React.createClass({
+        propTypes: {
+            name: React.PropTypes.string.isRequired, // обязательная строка
+            age: React.PropTypes.number
+        },
+        getDefaultProps: function() {
+            return {
+                age: 18 // по умолчанию
+            }
+        },
+        render: function() {
+            return React.DOM.p({
+                    className: 'greeter'
+                },
+                'Hello, ',
+                React.DOM.strong(null, this.props.name),
+                ' and I\'m ',
+                React.DOM.strong(null, this.props.age), // optional
+                '!');
+        }
+    });
+    ReactDOM.render(
+        React.createElement(Greeter, {
+            name: 'Vasya'
+            // name: 123 // будет Варнинг в консоли
+        }),
+        document.getElementById("appProp")
+    );
+    </script>
+</body>
+
+</html>
